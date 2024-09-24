@@ -19,7 +19,7 @@ pipeline {
             steps {
                 script {
                     // Build backend service
-                    sh 'docker-compose -f docker-compose.yaml build backend'
+                    sh 'docker compose -f docker-compose.yaml build backend'
                 }
             }
         }
@@ -28,16 +28,16 @@ pipeline {
             steps {
                 script {
                     // Start all services (db, backend, proxy)
-                    sh 'docker-compose -f docker-compose.yaml up -d'
+                    sh 'docker compose -f docker-compose.yaml up -d'
                 }
-            }
+            
         }
 
         stage('Wait for DB Service') {
             steps {
                 script {
                     // Wait for DB service to become healthy
-                    sh 'while ! docker-compose -f docker-compose.yaml exec db mysqladmin ping -h 127.0.0.1 --silent --password="$MYSQL_ROOT_PASSWORD"; do sleep 5; done'
+                    sh 'while ! docker compose -f docker-compose.yaml exec db mysqladmin ping -h 127.0.0.1 --silent --password="$MYSQL_ROOT_PASSWORD"; do sleep 5; done'
                 }
             }
         }
@@ -45,7 +45,7 @@ pipeline {
         stage('Run Tests') {
             steps {
                 // Run tests on the backend service (modify as needed)
-                sh 'docker-compose -f docker-compose.yaml exec backend ./run-tests.sh'
+                sh 'docker compose -f docker-compose.yaml exec backend ./run-tests.sh'
             }
         }
 
@@ -53,7 +53,7 @@ pipeline {
             steps {
                 script {
                     // Deploying proxy service
-                    sh 'docker-compose -f docker-compose.yaml up -d proxy'
+                    sh 'docker compose -f docker-compose.yaml up -d proxy'
                 }
             }
         }
@@ -63,7 +63,7 @@ pipeline {
         always {
             script {
                 // Clean up containers and volumes
-                sh 'docker-compose -f docker-compose.yaml down --volumes'
+                sh 'docker compose -f docker-compose.yaml down --volumes'
             }
         }
         success {
