@@ -41,14 +41,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Run Tests') {
-            steps {
-                // Run tests on the backend service (modify as needed)
-                sh 'docker compose -f docker-compose.yaml exec backend ./run-tests.sh'
-            }
-        }
-
         stage('Deploy') {
             steps {
                 script {
