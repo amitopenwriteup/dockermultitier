@@ -30,7 +30,7 @@ pipeline {
                     // Start all services (db, backend, proxy)
                     sh 'docker compose -f docker-compose.yaml up -d'
                 }
-            
+            }
         }
 
         stage('Wait for DB Service') {
