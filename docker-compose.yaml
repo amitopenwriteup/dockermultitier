@@ -48,7 +48,7 @@ services:
     build: proxy
     restart: always
     ports:
-      - 80:80
+      - 81:81
     depends_on:
       - backend
     networks:
