@@ -1,48 +1,65 @@
 version: '3.8'
+
 services:
   db:
+    container_name: db
     image: mariadb:10-focal
     restart: always
-    secrets:
-      - db-password
-    volumes:
-      - db-data:/var/lib/mysql
     networks:
       - backnet
+    volumes:
+      - db-data:/var/lib/mysql
+      - /run/secrets/db-password:/run/secrets/db-password:ro
     environment:
-      - MYSQL_DATABASE=example
-      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db-password
-    expose:
-      - 3306
-      - 33060
+      MYSQL_DATABASE: example
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db-password
+    ports:
+      - "3306:3306"
+      - "33060:33060"
+    secrets:
+      - db-password
 
   backend:
+    container_name: backend
     build:
       context: backend
       target: builder
     restart: always
-    secrets:
-      - db-password
-    ports:
-      - 8000:8000
     networks:
       - backnet
       - frontnet
-  proxy:
-    build: proxy
-    restart: always
+    volumes:
+      - backend-data:/app/data
+      - /run/secrets/db-password:/run/secrets/db-password:ro
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db-password
     ports:
-      - 81:81
+      - "8000:8000"
     depends_on:
-      - backend
+      - db
+    secrets:
+      - db-password
+
+  proxy:
+    container_name: proxy
+    build:
+      context: proxy
+    restart: always
     networks:
       - frontnet
-secrets:
-  db-password:
-    file: ./secrets/db-password
-volumes:
-  db-data:
+    ports:
+      - "81:80"
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+
 networks:
   backnet:
   frontnet:
 
+volumes:
+  db-data:
+  backend-data:
+
+secrets:
+  db-password:
+    file: ./secrets/db-password
