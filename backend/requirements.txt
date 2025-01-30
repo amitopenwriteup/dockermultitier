@@ -1,6 +1,7 @@
-Flask==2.2.3
 SQLAlchemy==2.0.19
 mysql-connector-python==8.0.33
 gunicorn==21.2.0
 requests==2.31.0
+Flask>=2.2.5
+Werkzeug>=2.2.0
 
