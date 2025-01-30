@@ -1,14 +1,8 @@
 version: '3.8'
-
 services:
   db:
     image: mariadb:10-focal
     restart: always
-    healthcheck:
-      test: ['CMD-SHELL', 'mysqladmin ping -h 127.0.0.1 --password="$$(cat /run/secrets/db-password)" --silent']
-      interval: 3s
-      retries: 5
-      start_period: 30s
     secrets:
       - db-password
     volumes:
@@ -21,9 +15,6 @@ services:
     expose:
       - 3306
       - 33060
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
 
   backend:
     build:
@@ -37,13 +28,6 @@ services:
     networks:
       - backnet
       - frontnet
-    depends_on:
-      db:
-        condition: service_healthy
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
-
   proxy:
     build: proxy
     restart: always
@@ -53,17 +37,11 @@ services:
       - backend
     networks:
       - frontnet
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
-
 secrets:
   db-password:
     file: ./secrets/db-password
-
 volumes:
   db-data:
-
 networks:
   backnet:
   frontnet:
