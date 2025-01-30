@@ -23,7 +23,6 @@ services:
     container_name: backend
     build:
       context: backend
-      target: builder
     restart: always
     networks:
       - backnet
